@@ -23,6 +23,9 @@ RUN addgroup -S app && adduser -S app -G app
 COPY --from=build --chown=app:app /app/public ./public
 COPY --from=build --chown=app:app /app/.next/standalone ./
 COPY --from=build --chown=app:app /app/.next/static ./.next/static
+# KEEP THIS: one log line per request (status + duration) is what the workspace Monitoring tab charts.
+# request-log.cjs is preloaded by the CMD below (`node -r ./request-log.cjs`).
+COPY --chown=app:app request-log.cjs ./
 USER app
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["node", "-r", "./request-log.cjs", "server.js"]
